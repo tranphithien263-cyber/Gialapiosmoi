@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS Giả Lập 11-17</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: linear-gradient(180deg, #0a0015 0%, #1a0033 100%);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  padding: 20px 16px;
+  min-height: 100vh;
+}
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.header h1 {
+  font-size: 26px;
+  color: #ff9500;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+}
+.header p {
+  color: #a855f7;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.btn-ios {
+  display: block;
+  width: 100%;
+  padding: 20px 10px;
+  background: linear-gradient(135deg, #1a0a30, #2d1a45);
+  border: 2px solid #a855f7;
+  border-radius: 16px;
+  color: #fff;
+  cursor: pointer;
+  font-family: Arial;
+  text-align: center;
+  transition: all 0.2s;
+}
+.btn-ios:hover {
+  background: linear-gradient(135deg, #2d1a45, #3d2a55);
+  border-color: #ec4899;
+  transform: translateY(-3px);
+}
+.btn-ios:active {
+  transform: translateY(0);
+}
+.btn-ios .ver {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff9500;
+  margin-bottom: 6px;
+}
+.btn-ios .year {
+  display: block;
+  font-size: 12px;
+  color: #a855f7;
+  letter-spacing: 1px;
+}
+
+/* Phone view */
+#phoneView {
+  display: none;
+  max-width: 420px;
+  margin: 0 auto;
+}
+#phoneView.show {
+  display: block;
+}
+.phone {
+  background: #000;
+  border-radius: 40px;
+  padding: 24px 20px 20px;
+  min-height: 700px;
+  border: 4px solid #333;
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.5);
+  position: relative;
+}
+.notch {
+  width: 120px;
+  height: 24px;
+  background: #000;
+  border-radius: 0 0 16px 16px;
+  margin: -24px auto 12px;
+  border: 1px solid #222;
+}
+.back-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  font-family: Arial;
+}
+.status {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+.ios-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ff9500;
+  margin-bottom: 20px;
+}
+.apps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 8px;
+}
+.app {
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: #fff;
+}
+.app .icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 13px;
+  background: #007aff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 5px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.app:active .icon {
+  opacity: 0.6;
+}
+.dock {
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  height: 70px;
+  background: rgba(50, 50, 80, 0.5);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+}
+.dock-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* App full view */
+#appView {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+#appView.show {
+  display: block;
+}
+#appView .topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+#appView .back-app {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: Arial;
+}
+#appView h2 {
+  color: #ff9500;
+  font-size: 20px;
+}
+#appView .content {
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.settings-row {
+  background: #1c1c1e;
+  padding: 14px 16px;
+  border-bottom: 1px solid #2c2c2e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.settings-row:first-child {
+  border-radius: 12px 12px 0 0;
+}
+.settings-row:last-child {
+  border-radius: 0 0 12px 12px;
+  border-bottom: none;
+}
+.msg-row {
+  background: #1c1c1e;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.msg-row b {
+  display: block;
+  margin-bottom: 4px;
+}
+.msg-row span {
+  color: #999;
+  font-size: 13px;
+}
+.calc-display {
+  background: #000;
+  color: #fff;
+  font-size: 42px;
+  text-align: right;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  min-height: 70px;
+  font-weight: 300;
+  word-break: break-all;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+.calc-btn {
+  padding: 18px;
+  font-size: 20px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: Arial;
+  aspect-ratio: 1;
+}
+.calc-btn.op {
+  background: #ff9500;
+}
+.calc-btn.clear {
+  background: #a5a5a5;
+  color: #000;
+}
+.calc-btn.zero {
+  grid-column: span 2;
+  border-radius: 40px;
+  aspect-ratio: auto;
+}
+.photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+}
+.photo {
+  padding-bottom: 100%;
+  position: relative;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  border-radius: 4px;
+}
+.photo span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+.photo:nth-child(2n) { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+.photo:nth-child(3n) { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.photo:nth-child(5n) { background: linear-gradient(135deg, #22c55e, #4ade80); }
+.notes-area {
+  width: 100%;
+  height: 400px;
+  background: #1c1c1e;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  padding: 14px;
+  resize: none;
+  outline: none;
+  font-family: Arial;
+}
+.game-area {
+  width: 100%;
+  height: 300px;
+  background: #0a0a15;
+  border: 2px solid #007aff;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.game-btn {
+  padding: 14px 30px;
+  background: #007aff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  font-family: Arial;
+}
+.game-dir {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: #1c1c1e;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  font-family: Arial;
+}
+.clock-big {
+  font-size: 64px;
+  text-align: center;
+  font-weight: 100;
+  margin: 40px 0;
+  color: #fff;
+}
+.clock-date {
+  text-align: center;
+  color: #999;
+  font-size: 16px;
+}
+.music-cover {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+}
+.music-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+}
+.weather-big {
+  font-size: 84px;
+  font-weight: 100;
+  text-align: center;
+}
+.weather-city {
+  font-size: 30px;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.weather-desc {
+  text-align: center;
+  color: #999;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+.weather-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.weather-card {
+  background: #1c1c1e;
+  border-radius: 10px;
+  padding: 14px;
+}
+.weather-card .lbl {
+  color: #999;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.weather-card .val {
+  font-size: 22px;
+}
+.browser-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #1c1c1e;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 16px;
+  outline: none;
+  font-family: Arial;
+}
+.browser-frame {
+  background: #1c1c1e;
+  border-radius: 10px;
+  padding: 60px 20px;
+  text-align: center;
+  color: #999;
+}
+.camera-view {
+  background: #1f2937;
+  border-radius: 12px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+}
+.map-view {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  border-radius: 12px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100px;
+}
+.appstore-row {
+  background: #1c1c1e;
+  padding: 14px;
+  border-bottom: 1px solid #2c2c2e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0;
+}
+.appstore-row:first-child { border-radius: 12px 12px 0 0; }
+.appstore-row:last-child { border-radius: 0 0 12px 12px; border-bottom: none; }
+.appstore-btn {
+  padding: 6px 16px;
+  background: #007aff;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: Arial;
+}
+.placeholder-app {
+  text-align: center;
+  padding: 60px 20px;
+}
+.placeholder-app .big {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+.placeholder-app p {
+  color: #999;
+}
+</style>
+</head>
+<body>
+
+<!-- MÀN HÌNH CHỌN iOS -->
+<div id="selectScreen">
+  <div class="header">
+    <h1>iOS GIẢ LẬP</h1>
+    <p>CHỌN PHIÊN BẢN iOS 11 → 17</p>
+  </div>
+
+  <div class="grid">
+    <button class="btn-ios" onclick="openIOS(11)">
+      <span class="ver">iOS 11</span>
+      <span class="year">2017</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(12)">
+      <span class="ver">iOS 12</span>
+      <span class="year">2018</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(13)">
+      <span class="ver">iOS 13</span>
+      <span class="year">2019</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(14)">
+      <span class="ver">iOS 14</span>
+      <span class="year">2020</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(15)">
+      <span class="ver">iOS 15</span>
+      <span class="year">2021</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(16)">
+      <span class="ver">iOS 16</span>
+      <span class="year">2022</span>
+    </button>
+    <button class="btn-ios" onclick="openIOS(17)">
+      <span class="ver">iOS 17</span>
+      <span class="year">2023</span>
+    </button>
+  </div>
+</div>
+
+<!-- MÀN HÌNH ĐIỆN THOẠI -->
+<div id="phoneView">
+  <div class="phone">
+    <div class="notch"></div>
+    <button class="back-btn" onclick="backToSelect()">← Chọn iOS khác</button>
+    <div class="status">
+      <span id="clock">00:00</span>
+      <span>📶 🔋</span>
+    </div>
+    <div class="ios-title" id="iosTitle">iOS</div>
+    <div class="apps" id="appList"></div>
+    <div class="dock">
+      <div class="dock-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a)" onclick="openApp('phone')">📞</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,#22c55e,#4ade80)" onclick="openApp('messages')">💬</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)" onclick="openApp('browser')">🌐</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,#ef4444,#f87171)" onclick="openApp('music')">🎵</div>
+    </div>
+  </div>
+</div>
+
+<!-- MÀN HÌNH APP -->
+<div id="appView">
+  <div class="topbar">
+    <button class="back-app" onclick="closeApp()">← Quay lại</button>
+    <h2 id="appTitle">App</h2>
+  </div>
+  <div class="content" id="appContent"></div>
+</div>
+
+<script>
+var APPS = [
+  { id: 'messages', icon: '💬', name: 'Tin nhắn', color: '#22c55e' },
+  { id: 'settings', icon: '⚙️', name: 'Cài đặt', color: '#6b7280' },
+  { id: 'camera', icon: '📷', name: 'Camera', color: '#1f2937' },
+  { id: 'photos', icon: '🌄', name: 'Ảnh', color: '#ec4899' },
+  { id: 'calc', icon: '🧮', name: 'Máy tính', color: '#f59e0b' },
+  { id: 'clock', icon: '🕐', name: 'Đồng hồ', color: '#374151' },
+  { id: 'notes', icon: '📝', name: 'Ghi chú', color: '#fcd34d' },
+  { id: 'music', icon: '🎵', name: 'Nhạc', color: '#ef4444' },
+  { id: 'weather', icon: '☀️', name: 'Thời tiết', color: '#0ea5e9' },
+  { id: 'browser', icon: '🌐', name: 'Safari', color: '#3b82f6' },
+  { id: 'appstore', icon: '🅰️', name: 'App Store', color: '#007aff' },
+  { id: 'game', icon: '🐍', name: 'Snake', color: '#22c55e' },
+  { id: 'maps', icon: '🗺️', name: 'Bản đồ', color: '#10b981' },
+  { id: 'mail', icon: '✉️', name: 'Mail', color: '#06b6d4' },
+  { id: 'phone', icon: '📞', name: 'Điện thoại', color: '#22c55e' }
+];
+
+var currentIOS = 0;
+
+function openIOS(v) {
+  currentIOS = v;
+  document.getElementById('selectScreen').style.display = 'none';
+  document.getElementById('phoneView').classList.add('show');
+  document.getElementById('iosTitle').textContent = 'iOS ' + v;
+  renderApps();
+  updateClock();
+}
+
+function backToSelect() {
+  document.getElementById('phoneView').classList.remove('show');
+  document.getElementById('selectScreen').style.display = 'block';
+  document.getElementById('appView').classList.remove('show');
+}
+
+function renderApps() {
+  var list = document.getElementById('appList');
+  list.innerHTML = '';
+  var i, app, div;
+  for (i = 0; i < APPS.length; i++) {
+    app = APPS[i];
+    div = document.createElement('div');
+    div.className = 'app';
+    div.setAttribute('data-appid', app.id);
+    div.innerHTML = '<div class="icon" style="background:' + app.color + '">' + app.icon + '</div>' + app.name;
+    div.onclick = (function(id) {
+      return function() { openApp(id); };
+    })(app.id);
+    list.appendChild(div);
+  }
+}
+
+function openApp(id) {
+  var app = null;
+  var i;
+  for (i = 0; i < APPS.length; i++) {
+    if (APPS[i].id === id) { app = APPS[i]; break; }
+  }
+  if (!app) return;
+  document.getElementById('appTitle').textContent = app.name;
+  document.getElementById('appContent').innerHTML = getAppContent(id);
+  document.getElementById('appView').classList.add('show');
+  if (id === 'calc') initCalc();
+  if (id === 'clock') startClock();
+}
+
+function closeApp() {
+  document.getElementById('appView').classList.remove('show');
+  if (typeof clockInterval !== 'undefined') clearInterval(clockInterval);
+  if (typeof gameInterval !== 'undefined') clearInterval(gameInterval);
+  gRunning = false;
+}
+
+function getAppContent(id) {
+  if (id === 'messages') {
+    return '<div class="msg-row"><b>An</b><span>Tối nay đi chơi không?</span></div>' +
+           '<div class="msg-row"><b>Bình</b><span>Ok luôn 🔥</span></div>' +
+           '<div class="msg-row"><b>Chi</b><span>Gửi ảnh cho mình với</span></div>' +
+           '<div class="msg-row"><b>Dũng</b><span>Mai họp 8h nhé</span></div>';
+  }
+  if (id === 'settings') {
+    return '<div style="background:#1c1c1e;border-radius:12px;overflow:hidden">' +
+           '<div class="settings-row">✈️ Chế độ máy bay <span style="color:#999">Tắt</span></div>' +
+           '<div class="settings-row">📶 Wi-Fi <span style="color:#999">Nhà_5G ›</span></div>' +
+           '<div class="settings-row">📶 Bluetooth <span style="color:#999">Bật</span></div>' +
+           '<div class="settings-row">📱 Di động <span style="color:#999">Bật</span></div>' +
+           '<div class="settings-row">🔔 Thông báo <span style="color:#999">›</span></div>' +
+           '<div class="settings-row">🔊 Âm thanh <span style="color:#999">›</span></div>' +
+           '<div class="settings-row">🌙 Màn hình <span style="color:#999">›</span></div>' +
+           '<div class="settings-row">🔋 Pin <span style="color:#999">87% ›</span></div>' +
+           '<div class="settings-row">⚙️ Cài đặt chung <span style="color:#999">›</span></div>' +
+           '<div class="settings-row">🔒 Quyền riêng tư <span style="color:#999">›</span></div>' +
+           '</div>' +
+           '<p style="text-align:center;color:#666;margin-top:16px;font-size:12px">iOS ' + currentIOS + '</p>';
+  }
+  if (id === 'camera') {
+    return '<div class="camera-view">📷</div><p style="text-align:center;color:#999;margin-top:12px">Camera giả lập — không chụp được</p>';
+  }
+  if (id === 'photos') {
+    var html = '<div class="photos">';
+    var emojis = ['🌄','🌅','🏖️','🌊','🌸','🍀','🐱','🐶','🍕','🎸','⚽','🎨','🌺','🌻','🦋','🌲','🏔️','🌴'];
+    var i;
+    for (i = 0; i < 18; i++) {
+      html += '<div class="photo"><span>' + emojis[i] + '</span></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+  if (id === 'calc') {
+    return '<div class="calc-display" id="calcDisplay">0</div>' +
+           '<div class="calc-grid">' +
+           '<button class="calc-btn clear" onclick="calcClear()">AC</button>' +
+           '<button class="calc-btn clear" onclick="calcNum(\'(\')">(</button>' +
+           '<button class="calc-btn clear" onclick="calcNum(\')\')">)</button>' +
+           '<button class="calc-btn op" onclick="calcOp(\'/\')">÷</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'7\')">7</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'8\')">8</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'9\')">9</button>' +
+           '<button class="calc-btn op" onclick="calcOp(\'*\')">×</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'4\')">4</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'5\')">5</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'6\')">6</button>' +
+           '<button class="calc-btn op" onclick="calcOp(\'-\')">−</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'1\')">1</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'2\')">2</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'3\')">3</button>' +
+           '<button class="calc-btn op" onclick="calcOp(\'+\')">+</button>' +
+           '<button class="calc-btn zero" onclick="calcNum(\'0\')">0</button>' +
+           '<button class="calc-btn" onclick="calcNum(\'.\')">.</button>' +
+           '<button class="calc-btn op" onclick="calcEq()">=</button>' +
+           '</div>';
+  }
+  if (id === 'clock') {
+    return '<div class="clock-big" id="clockBig">00:00:00</div>' +
+           '<div class="clock-date" id="clockDate">-</div>';
+  }
+  if (id === 'notes') {
+    return '<textarea class="notes-area" placeholder="Viết ghi chú..."></textarea>';
+  }
+  if (id === 'music') {
+    return '<div style="text-align:center">' +
+           '<div class="music-cover">🎵</div>' +
+           '<h3 style="margin:12px 0 4px">Thiên Chúa Anthem</h3>' +
+           '<p style="color:#999;margin-bottom:20px">ZiettKhueee</p>' +
+           '<button class="music-btn" onclick="alert(\'Đang phát nhạc\')">▶</button>' +
+           '</div>';
+  }
+  if (id === 'weather') {
+    return '<div class="weather-city">Hà Nội</div>' +
+           '<div class="weather-big">28°</div>' +
+           '<div class="weather-desc">Nhiều mây</div>' +
+           '<div class="weather-grid">' +
+           '<div class="weather-card"><div class="lbl">ĐỘ ẨM</div><div class="val">72%</div></div>' +
+           '<div class="weather-card"><div class="lbl">GIÓ</div><div class="val">12 km/h</div></div>' +
+           '<div class="weather-card"><div class="lbl">UV</div><div class="val">3</div></div>' +
+           '<div class="weather-card"><div class="lbl">CẢM GIÁC</div><div class="val">30°</div></div>' +
+           '</div>';
+  }
+  if (id === 'browser') {
+    return '<input type="text" class="browser-input" value="https://" placeholder="Tìm kiếm hoặc nhập URL">' +
+           '<div class="browser-frame">🌐 Safari giả lập<br><br>Không truy cập internet thật</div>';
+  }
+  if (id === 'appstore') {
+    var list = ['🐍 Snake Game', '🎮 Minecraft', '🎯 Target', '🚗 Racing', '🎨 Draw', '📷 Photo Editor'];
+    var html = '<div style="background:#1c1c1e;border-radius:12px;overflow:hidden">';
+    var i;
+    for (i = 0; i < list.length; i++) {
+      html += '<div class="appstore-row"><span>' + list[i] + '</span><button class="appstore-btn" onclick="alert(\'Đã tải ' + list[i] + '\')">TẢI</button></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+  if (id === 'game') {
+    return '<div style="text-align:center;margin-bottom:12px">Điểm: <span id="gameScore" style="color:#4ade80;font-weight:bold">0</span></div
